@@ -5,71 +5,140 @@
   <title>Interactive US Map with CSV Data</title>
   <style>
     #info-box {
-      padding: 10px;
-      border: 1px solid #ddd;
-      width: 300px;
-      margin-top: 20px;
-    }
-    svg {
-      cursor: pointer;
-    }
-    svg path {
-      stroke: #fff;
-      stroke-width: 1px;
-      transition: fill 0.3s;
-    }
-    svg path:hover {
-      fill: #f39c12;
-    }
+  position: absolute;
+  right: 10px;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px; /* Rounded corners */
+  border: 1px solid #ddd;
+  width: 30%;
+  background-color: #006A55;
+  color: white; /* White text */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adds shadow */
+}
+
+svg {
+  cursor: pointer;
+}
+
+svg path {
+  stroke: #fff;
+  stroke-width: 1px;
+  transition: fill 0.3s;
+}
+
+svg path:hover {
+  fill: #E76425;
+}
+
 
     /* Legend styles */
-    #legend {
-      position: absolute;
-      top: 20px;
+#legend {
+  font-size: 12px;
+  position: fixed; /* Fixes the position so it stays on-screen even when scrolling */
+  bottom: 20px; /* Positions it from the bottom of the viewport */
+  left: 10px; /* Centers it horizontally based on the viewport */
+  background-color: white;
+  border-radius: 8px; /* Rounded corners */
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap; /* Allows items to wrap to the next line if necessary */
+  align-items: center;
+  gap: 5px; /* Adds spacing between legend items */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  z-index: 1000; /* Keeps the legend on top of other elements */
+  max-width: 60%; /* Maximum width based on screen size */
+  text-align: center; /* Centers text within the container */
+}
+
+#legend h3 {
+  font-size: 14px;
+  margin-top: 0;
+  width: 100%; /* Full width for centered title */
+}
+
+#legend div {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Spacing between color box and label */
+}
+
+#legend span {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+}
+
+
+    
+.green { background-color: #006B57; } /* Legal, can only be sold where marijuana is sold */
+.light-green { background-color: #009C80; } /* Legal, regulated like marijuana */
+.yellow { background-color: #E3C71F; } /* Legal, some restrictions / Mixed */
+.dark-brown { background-color: #6D3419; } /* Illegal/Heavily restricted */
+.blue { background-color: #007698; } /* Legal, THC potency limits + regulated */
+.brown { background-color: #B44B28; } /* Illegal */
+.gray { background-color: #808080; } /* Gray area */
+.dark-green { background-color: #005240; } /* Legal */
+.green2 { background-color: #66B045; }
+
+  
+    /* Bottom-right image styles */
+    #bottom-right-image {
+      position: fixed;
+      bottom: 20px;
       right: 20px;
-      background-color: white;
-      border: 1px solid #ddd;
-      padding: 10px;
-      width: 150px;
+      width: 80px; /* Adjust size as needed */
+      height: auto; /* Maintain aspect ratio */
+      z-index: 0; /* Ensure it stays above other content */
+      background
     }
-    #legend h3 {
-      font-size: 16px;
-      margin-top: 0;
-      text-align: center;
+    /* Bottom-right image2 styles */
+    #bottom-right-image2 {
+      position: fixed;
+      bottom: 20px;
+      right: 100px;
+      width: 100px; /* Adjust size as needed */
+      height: auto; /* Maintain aspect ratio */
+      z-index: 0; /* Ensure it stays above other content */
+      background
     }
-    #legend div {
-      display: flex;
-      align-items: center;
-      margin-bottom: 5px;
-    }
-    #legend span {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      margin-right: 10px;
-    }
-    .red { background-color: #FF0000; } /* Example color */
-    .green { background-color: #2ecc71; } /* Add more colors as needed */
-    .blue { background-color: #C9DAF8; }
-    .gray { background-color: #252D33; }
-    .yellow { background-color: #FFF2CC; }
+    #designer-credit {
+  position: fixed;
+  bottom: 2px;
+  left: 20px;
+  font-size: 12px;
+  font-style: italic;
+  color: #333; /* Dark color for better readability */
+  z-index: 1000; /* Ensures it stays above other elements */
+}
+
   </style>
 </head>
 <body>
 
-  <div id="info-box">Click a state to see the details.</div>
-
+  <div id="info-box"> Hover over a state to see the details.</div>
+<div id="designer-credit">Designed by Uilvim E. G. Franco</div>
   <div id="legend">
     <h3>Legend</h3>
-    <div><span class="green"></span> Legal</div>
-    <div><span class="blue"></span> Legal Regulated</div>
-    <div><span class="yellow"></span> Partially Legal</div>
-    <div><span class="red"></span> Illegal</div>
-    <div><span class="gray"></span> Gray Area</div>
+      <div><span class="dark-green"></span> Legal</div>
+      <div><span class="green2"></span> Legal, some restrictions</div>
+      <div><span class="yellow"></span> Mixed</div>
+      <div><span class="brown"></span> Illegal</div>
+      <div><span class="dark-brown"></span> Heavily restricted</div>
+      
+ 
+     
+      
+
     <!-- Add more legend items as needed -->
   </div>
+   <!-- Bottom-right image -->
+  <img id="bottom-right-image" src="https://riceconnect.rice.edu/image/baker/Baker_Horizontal_With-Rice_RGB.png" alt="Bottom Right Image">
+    <img id="bottom-right-image2" src="https://assets-crc-ssl-projects.s3.us-east-1.amazonaws.com/images/OIT%20%26%20CRC%20logo%20color%20with%20words%20%281%29.jpg" alt="Bottom Right Image">
+  
+  <svg id="us-map" viewBox="174 100 959 593" preserveAspectRatio="xMidYMid meet" xml:space="preserve" style="width: 65%; height: auto; max-height: 80vh;">
 
-  <svg id="us-map" width="959px" height="593px" viewBox="174 100 959 593" enable-background="new 174 100 959 593" xml:space="preserve">
+
     <g id="g5">
       <a href="#"><path id="Hawaii" d="M407.1,619.3l1.9-3.6l2.3-0.3l0.3,0.8l-2.1,3.1H407.1z M417.3,615.6l6.1,2.6l2.1-0.3l1.6-3.9l-0.6-3.4l-4.2-0.5l-4,1.8L417.3,615.6z M448,625.6l3.7,5.5l2.4-0.3l1.1-0.5l1.5,1.3l3.7-0.2l1-1.5l-2.9-1.8l-1.9-3.7l-2.1-3.6l-5.8,2.9L448,625.6z M468.2,634.5l1.3-1.9l4.7,1l0.6-0.5l6.1,0.6l-0.3,1.3l-2.6,1.5l-4.4-0.3L468.2,634.5z M473.5,639.7l1.9,3.9l3.1-1.1l0.3-1.6l-1.6-2.1l-3.7-0.3V639.7z M480.5,638.5l2.3-2.9l4.7,2.4l4.4,1.1l4.4,2.7v1.9l-3.6,1.8l-4.8,1l-2.4-1.5L480.5,638.5z M497.1,654.1l1.6-1.3l3.4,1.6l7.6,3.6l3.4,2.1l1.6,2.4l1.9,4.4l4,2.6l-0.3,1.3l-3.9,3.2l-4.2,1.5l-1.5-0.6l-3.1,1.8l-2.4,3.2l-2.3,2.9l-1.8-0.2l-3.6-2.6l-0.3-4.5l0.6-2.4l-1.6-5.7l-2.1-1.8l-0.2-2.6l2.3-1l2.1-3.1l0.5-1l-1.6-1.8L497.1,654.1z" /></a>
       <!-- Add paths for other states here with the correct paths -->
@@ -131,29 +200,33 @@
     // Function to map types to colors
     function getColorFromType(type) {
       switch(type) {
-        case "Legal_regulated like marijuana":
-          return "#C9DAF8";  // Light Blue
-        case "Legal, no total THC potency limits":
-          return "#006400";  // Dark Green
-        case "Partially Legal":
-          return "#FFF2CC";  // Yellow
+        case "Legal (Can only be sold where marijuana is sold)":
+          return "#006B57";  // Green
+        case "Legal (Regulated like marijuana)":
+          return "#009C80";  // Light Green
+        case "Legal (Some restrictions)":
+          return "#66B045";  // Yellow
+        case "Mixed":
+          return "#E3C71F";  
+        case "Heavily restricted":
+          return "#6D3419";  // Dark Brown 
         case "Illegal":
-          return "#FF0000";  // Red
+          return "#B44B28";  // Brown
         case "Gray area":
           return "#808080";  // Gray
         case "Legal":
-          return "#90EE90";  // Light Green
+          return "#005240";  // Light Green
         default:
-          return "#252d33";  // Default dark gray for undefined types
+          return "#A7A9AC";  // Default dark gray for undefined types
       }
     }
 
-    // Parse CSV data into an array of objects
-    function parseCSV(csvText) {
-      const lines = csvText.split('\n');
-      const headers = lines[0].split(',').map(header => header.trim());
+    // Parse TSV data into an array of objects
+    function parseTSV(tsvText) {
+      const lines = tsvText.split('\n');
+      const headers = lines[0].split('\t').map(header => header.trim());
       const data = lines.slice(1).map(line => {
-        const values = line.split(',');
+        const values = line.split('\t');
         const rowData = {};
         headers.forEach((header, i) => {
           rowData[header] = values[i] ? values[i].trim() : '';
@@ -163,28 +236,29 @@
       return data;
     }
 
-    // Load CSV data and update state colors
-    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRzu6ZojpcKuxjlf4Sou4eJaVPVkd9GdNbk5f-Imru7bqvEU1cSv5PzeViKo7XS51Xkcm1n24tjMsf0/pub?gid=0&single=true&output=csv';
+    // Load TSV data and update state colors
+    const tsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRSw8J1erY15jXjGpurdxPAc1LRLTe6fu1lbHkVFyMuiRYUsdF17LDIQQKXium6pK3uB4Io5RJDsjj7/pub?gid=586541007&single=true&output=tsv';
     let stateData = {};
 
-    fetch(csvUrl)
+    fetch(tsvUrl)
       .then(response => response.text())
-      .then(csvText => {
-        const data = parseCSV(csvText);
+      .then(tsvText => {
+        const data = parseTSV(tsvText);
         const stateColors = {};
 
-        // Assign colors based on 'Type' in CSV and store state details
+        // Assign colors based on 'Type' in TSV and store state details
         data.forEach(row => {
           const stateName = row['State'] ? row['State'].trim() : '';  // Check if 'State' exists
-          const type = row['Type'] ? row['Type'].trim() : '';          // Check if 'Type' exists
+          const type = row['Legal Status'] ? row['Legal Status'].trim() : ''; // Check if 'Type' exists
 
           if (stateName && type) {
             stateColors[stateName] = getColorFromType(type);
             stateData[stateName] = {
               lastUpdated: row['Last Updated'] ? row['Last Updated'].trim() : '',
               type: type,
-              passedLegislation: row['Passed Legislation'] ? row['Passed Legislation'].trim() : '',
-              description: row['Description'] ? row['Description'].trim() : ''
+              passedLegislation: row['Relevant Laws'] ? row['Relevant Laws'].trim() : '',
+              restrictions: row['Potency Restrictions'] ? row['Potency Restrictions'].trim() : '',
+              description: row['Details'] ? row['Details'].trim() : ''
             };
           }
         });
@@ -210,24 +284,34 @@
         infoBox.innerHTML = `
           <h2>${stateId}</h2>
           <p><strong>Last Updated:</strong> ${stateInfo.lastUpdated}</p>
-          <p><strong>Type:</strong> ${stateInfo.type}</p>
-          <p><strong>Passed Legislation:</strong> ${stateInfo.passedLegislation}</p>
-          <p><strong>Description:</strong> ${stateInfo.description}</p>
+          <p><strong>Legal Status:</strong> ${stateInfo.type}</p>
+          <p><strong>Relevant Legislation:</strong> ${stateInfo.passedLegislation}</p>
+          <p><strong>Potency Restrictions:</strong> ${stateInfo.restrictions}</p>
+          <p><strong>Details:</strong> ${stateInfo.description}</p>
         `;
       } else {
         infoBox.innerHTML = `<p>No information available for ${stateId}.</p>`;
       }
     }
 
-    // Add event listeners to states
+    // Function to reset info box when not hovering over any state
+    function resetInfoBox() {
+      const infoBox = document.getElementById('info-box');
+      infoBox.innerHTML = 'Hover over a state to see the details.';
+    }
+
+    // Add hover event listeners to states
     const paths = document.querySelectorAll('svg path');
     paths.forEach(path => {
-      path.addEventListener('click', () => {
+      path.addEventListener('mouseenter', (event) => {
+        console.log(event)
         const stateId = path.id;
         showStateInfo(stateId);
       });
+      path.addEventListener('mouseleave', resetInfoBox);
     });
-  </script>
+</script>
+
 
 </body>
 </html>
