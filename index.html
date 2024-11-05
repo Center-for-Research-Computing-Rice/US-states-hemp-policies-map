@@ -15,8 +15,10 @@
   background-color: #006A55;
   color: white; /* White text */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adds shadow */
-  z-index: 1000;
+  max-height: calc(100vh - 100px); /* Sets a max height */
+  overflow-y: auto; /* Enables vertical scrolling */
 }
+
 
 svg {
   cursor: pointer;
@@ -122,10 +124,10 @@ svg path:hover {
   <div id="legend">
     <h3>Legend</h3>
       <div><span class="dark-green"></span> Legal</div>
-      <div><span class="green2"></span> Legal, some restrictions</div>
-      <div><span class="yellow"></span> Mixed</div>
+      <div><span class="green2"></span> Legal, Some Restrictions</div>
       <div><span class="brown"></span> Illegal</div>
-      <div><span class="dark-brown"></span> Heavily restricted</div>
+      <div><span class="dark-brown"></span> Heavily Restricted</div>
+      <div><span class="yellow"></span> Mixed</div>
       
  
      
@@ -205,11 +207,11 @@ svg path:hover {
           return "#006B57";  // Green
         case "Legal (Regulated like marijuana)":
           return "#009C80";  // Light Green
-        case "Legal (Some restrictions)":
+        case "Legal, Some Restrictions":
           return "#66B045";  // Yellow
         case "Mixed":
           return "#E3C71F";  
-        case "Heavily restricted":
+        case "Heavily Restricted":
           return "#6D3419";  // Dark Brown 
         case "Illegal":
           return "#B44B28";  // Brown
@@ -259,7 +261,10 @@ svg path:hover {
               type: type,
               passedLegislation: row['Relevant Laws'] ? row['Relevant Laws'].trim() : '',
               restrictions: row['Potency Restrictions'] ? row['Potency Restrictions'].trim() : '',
-              description: row['Details'] ? row['Details'].trim() : ''
+              description: row['Details'] ? row['Details'].trim() : '',
+              age: row['Age Restrictions'] ? row['Age Restrictions'].trim() : '',
+              advertising: row['Advertising Restrictions'] ? row['Advertising Restrictions'].trim() : '',
+              challenge: row['Challenge to Current Legal Status'] ? row['Challenge to Current Legal Status'].trim() : ''
             };
           }
         });
@@ -288,7 +293,10 @@ svg path:hover {
           <p><strong>Legal Status:</strong> ${stateInfo.type}</p>
           <p><strong>Relevant Legislation:</strong> ${stateInfo.passedLegislation}</p>
           <p><strong>Potency Restrictions:</strong> ${stateInfo.restrictions}</p>
+          <p><strong>Age Restrictions:</strong> ${stateInfo.age}</p>
+          <p><strong>Advertising Restrictions:</strong> ${stateInfo.advertising}</p>
           <p><strong>Details:</strong> ${stateInfo.description}</p>
+          <p><strong>Challenge to Current Legal Status:</strong> ${stateInfo.challenge}</p>
         `;
       } else {
         infoBox.innerHTML = `<p>No information available for ${stateId}.</p>`;
