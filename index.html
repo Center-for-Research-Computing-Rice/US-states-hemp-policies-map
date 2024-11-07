@@ -150,6 +150,13 @@ svg path:hover {
   z-index: 1000; /* Ensures it stays above other elements */
 }
 
+ .pinned {
+  stroke: #E76425;
+  stroke-width: 3px;
+  filter: drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.7)); /* Darker, slightly larger shadow on hover */
+}
+
+    
   </style>
 </head>
 <body>
@@ -160,8 +167,8 @@ svg path:hover {
     <h3>Legend</h3>
       <div><span class="dark-green"></span> Legal</div>
       <div><span class="green2"></span> Legal, Some Restrictions</div>
-      <div><span class="brown"></span> Illegal</div>
       <div><span class="dark-brown"></span> Heavily Restricted</div>
+      <div><span class="brown"></span> Illegal</div>
       <div><span class="yellow"></span> Mixed</div>
       
  
@@ -316,7 +323,11 @@ svg path:hover {
         });
       });
 
-   function showStateInfo(stateId) {
+   let isPinned = false;
+let pinnedPath = null; // Track the currently pinned path
+
+// Function to show state information in the info box
+function showStateInfo(stateId) {
   const infoBox = document.getElementById('info-box');
   const stateInfo = stateData[stateId];
 
@@ -339,22 +350,50 @@ svg path:hover {
   }
 }
 
-    // Function to reset info box when not hovering over any state
-    function resetInfoBox() {
-      const infoBox = document.getElementById('info-box');
-      infoBox.innerHTML = 'Hover over a state to see the details.';
+// Function to reset info box when not hovering over any state and not pinned
+function resetInfoBox() {
+  if (!isPinned) {
+    const infoBox = document.getElementById('info-box');
+    infoBox.innerHTML = 'Hover over a state to see the details.';
+  }
+}
+
+// Add hover and click event listeners to states
+const paths = document.querySelectorAll('svg path');
+paths.forEach(path => {
+  path.addEventListener('mouseenter', (event) => {
+    // Only show state info if not pinned
+    if (!isPinned) {
+      const stateId = path.id;
+      showStateInfo(stateId);
+    }
+  });
+  
+  path.addEventListener('mouseleave', resetInfoBox);
+  
+  path.addEventListener('click', () => {
+    // If there’s a previously pinned path, remove the pinned class
+    if (pinnedPath && pinnedPath !== path) {
+      pinnedPath.classList.remove('pinned');
     }
 
-    // Add hover event listeners to states
-    const paths = document.querySelectorAll('svg path');
-    paths.forEach(path => {
-      path.addEventListener('mouseenter', (event) => {
-        console.log(event)
-        const stateId = path.id;
-        showStateInfo(stateId);
-      });
-      path.addEventListener('mouseleave', resetInfoBox);
-    });
+    // Toggle the pinned state
+    isPinned = !isPinned;
+
+    // If the state is now pinned, add the pinned class and set as pinnedPath
+    if (isPinned) {
+      path.classList.add('pinned');
+      pinnedPath = path;
+    } else {
+      // Otherwise, remove the class and clear pinnedPath
+      path.classList.remove('pinned');
+      pinnedPath = null;
+    }
+  });
+});
+
+
+
 </script>
 
 
