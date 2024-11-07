@@ -8,16 +8,44 @@
   position: absolute;
   right: 10px;
   margin-top: 10px;
-  padding: 10px;
-  border-radius: 10px; /* Rounded corners */
-  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 15px; /* More rounded corners */
+  border: none; /* Remove border for a cleaner look */
   width: 30%;
-  background-color: #006A55;
-  color: white; /* White text */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adds shadow */
-  max-height: calc(100vh - 100px); /* Sets a max height */
-  overflow-y: auto; /* Enables vertical scrolling */
+  background: linear-gradient(135deg, #004D40, #00796B); /* Gradient background */
+  color: white;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Deeper shadow */
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  font-family: Arial, sans-serif;
 }
+
+#info-box h2 {
+  font-size: 1.8em;
+  color: #FFFFFF; /* Gold color for title */
+  margin-bottom: 10px;
+}
+
+#info-box p {
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+#info-box p strong {
+  color: #FFD700; /* Gold for section headers */
+}
+
+#info-box .divider {
+  border-top: 1px solid rgba(255, 255, 255, 0.3); /* Divider line */
+  margin: 10px 0;
+}
+
+.icon {
+  display: inline-block;
+  margin-right: 5px;
+  color: #FFD700;
+}
+
 
 
 svg {
@@ -27,11 +55,14 @@ svg {
 svg path {
   stroke: #fff;
   stroke-width: 1px;
-  transition: fill 0.3s;
+  transition: stroke 0.3s ease;
+  
 }
 
 svg path:hover {
-  fill: #E76425;
+  stroke: #E76425;
+  stroke-width: 3px;
+  filter: drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.7)); /* Darker, slightly larger shadow on hover */
 }
 
 
@@ -281,27 +312,28 @@ svg path:hover {
         });
       });
 
-    // Function to display state data in the info box
-    function showStateInfo(stateId) {
-      const infoBox = document.getElementById('info-box');
-      const stateInfo = stateData[stateId];
+   function showStateInfo(stateId) {
+  const infoBox = document.getElementById('info-box');
+  const stateInfo = stateData[stateId];
 
-      if (stateInfo) {
-        infoBox.innerHTML = `
-          <h2>${stateId}</h2>
-          <p><strong>Last Updated:</strong> ${stateInfo.lastUpdated}</p>
-          <p><strong>Legal Status:</strong> ${stateInfo.type}</p>
-          <p><strong>Relevant Legislation:</strong> ${stateInfo.passedLegislation}</p>
-          <p><strong>Potency Restrictions:</strong> ${stateInfo.restrictions}</p>
-          <p><strong>Age Restrictions:</strong> ${stateInfo.age}</p>
-          <p><strong>Advertising Restrictions:</strong> ${stateInfo.advertising}</p>
-          <p><strong>Details:</strong> ${stateInfo.description}</p>
-          <p><strong>Challenge to Current Legal Status:</strong> ${stateInfo.challenge}</p>
-        `;
-      } else {
-        infoBox.innerHTML = `<p>No information available for ${stateId}.</p>`;
-      }
-    }
+  if (stateInfo) {
+    infoBox.innerHTML = `
+      <h2>${stateId}</h2>
+      <p><strong>Last Updated:</strong> ${stateInfo.lastUpdated}</p>
+      <div class="divider"></div>
+      <p><strong>Legal Status:</strong> ${stateInfo.type}</p>
+      <p><strong>Relevant Legislation:</strong> ${stateInfo.passedLegislation}</p>
+      <p><strong>Potency Restrictions:</strong> ${stateInfo.restrictions}</p>
+      <p><strong>Age Restrictions:</strong> ${stateInfo.age}</p>
+      <p><strong>Advertising Restrictions:</strong> ${stateInfo.advertising}</p>
+      <div class="divider"></div>
+      <p><span class="icon">ℹ️</span><strong>Details:</strong> ${stateInfo.description}</p>
+      <p><strong>Challenge to Current Legal Status:</strong> ${stateInfo.challenge}</p>
+    `;
+  } else {
+    infoBox.innerHTML = `<p>No information available for ${stateId}.</p>`;
+  }
+}
 
     // Function to reset info box when not hovering over any state
     function resetInfoBox() {
