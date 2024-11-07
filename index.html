@@ -160,6 +160,31 @@ svg path:hover {
   </style>
 </head>
 <body>
+  <div id="info-icon" style="position: absolute; top: 10px; left: 10px; cursor: pointer;font-size: 24px;">
+  ℹ️
+</div>
+
+<div id="info-popup" style="display: none; position: absolute; top: 40px; left: 10px; padding: 10px; background-color: white; border: 1px solid #ccc; width: 300px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);border-radius: 15px; /* More rounded corners */">
+  <p>
+    This interactive map allows you to explore detailed information about each state by simply hovering your mouse over it. When you hover over a state, an info box will display key details, making it easy to quickly gather insights.
+  </p>
+  <p>
+    If you'd like to keep the information visible as you explore, just click on the state. This "pins" the info box, so the details remain even if you move your mouse away. While a state is pinned, the info box won’t update when you hover over other states, allowing you to focus on a specific state's information without interruption. Click the state again to "unpin" it and return to hover mode. This feature makes it convenient to compare information or revisit details at your own pace.
+  </p>
+  <button id="close-info-popup" style="
+  display: block;
+  margin: 10px auto 0;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #004D40, #00796B);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+">Close</button>
+
+</div>
+
 
   <div id="info-box"> Hover over a state to see the details.</div>
 <div id="designer-credit">Designed by Uilvim E. G. Franco</div>
@@ -392,6 +417,15 @@ paths.forEach(path => {
   });
 });
 
+document.getElementById('info-icon').addEventListener('click', () => {
+  const infoPopup = document.getElementById('info-popup');
+  infoPopup.style.display = infoPopup.style.display === 'none' ? 'block' : 'none';
+});
+
+// Close button to hide the info popup
+document.getElementById('close-info-popup').addEventListener('click', () => {
+  document.getElementById('info-popup').style.display = 'none';
+});
 
 
 </script>
