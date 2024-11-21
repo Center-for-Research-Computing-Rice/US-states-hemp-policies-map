@@ -50,6 +50,19 @@
   color: #FFD700;
 }
 
+/* General styling for hyperlinks in infoBox */
+#info-box a {
+  color: #FFFFFF; /* Link color */
+  text-decoration: underline; /* Remove underline */
+  font-weight: bold; /* Bold font */
+  font-size: 12px;
+}
+
+#info-box a:hover {
+  color: #007bff; /* Darker color on hover */
+  text-decoration: underline; /* Underline on hover */
+  font-size: 14px;
+}
 
 
 svg {
@@ -64,7 +77,7 @@ svg path {
 }
 
 svg path:hover {
-  stroke: #E76425;
+  stroke: #00A6ED;
   stroke-width: 3px;
   filter: drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.7)); /* Darker, slightly larger shadow on hover */
 }
@@ -331,7 +344,7 @@ svg path:hover {
               description: row['Details'] ? row['Details'].trim() : '',
               age: row['Age Restrictions'] ? row['Age Restrictions'].trim() : '',
               advertising: row['Advertising Restrictions'] ? row['Advertising Restrictions'].trim() : '',
-              challenge: row['Challenge to Current Legal Status'] ? row['Challenge to Current Legal Status'].trim() : ''
+              challenge: row['Marijuana Is:'] ? row['Marijuana Is:'].trim() : ''
             };
           }
         });
@@ -356,23 +369,40 @@ function showStateInfo(stateId) {
   const infoBox = document.getElementById('info-box');
   const stateInfo = stateData[stateId];
 
-  if (stateInfo) {
+   if (stateInfo) {
     infoBox.innerHTML = `
       <h2>${stateId}</h2>
-      <p><strong>Last Updated:</strong> ${stateInfo.lastUpdated}</p>
+      ${stateInfo.lastUpdated ? `<p><strong>Last Updated:</strong> ${sanitize(stateInfo.lastUpdated)}</p>` : ''}
       <div class="divider"></div>
-      <p><strong>Legal Status:</strong> ${stateInfo.type}</p>
-      <p><strong>Relevant Legislation:</strong> ${stateInfo.passedLegislation}</p>
-      <p><strong>Potency Restrictions:</strong> ${stateInfo.restrictions}</p>
-      <p><strong>Age Restrictions:</strong> ${stateInfo.age}</p>
-      <p><strong>Advertising Restrictions:</strong> ${stateInfo.advertising}</p>
+      ${stateInfo.type ? `<p><strong>Legal Status:</strong> ${sanitize(stateInfo.type)}</p>` : ''}
+      ${stateInfo.passedLegislation ? `<p><strong>Relevant Laws:</strong> ${sanitize(stateInfo.passedLegislation)}</p>` : ''}
+      ${stateInfo.restrictions ? `<p><strong>Potency Restrictions:</strong> ${sanitize(stateInfo.restrictions)}</p>` : ''}
+      ${stateInfo.age ? `<p><strong>Age Restrictions:</strong> ${sanitize(stateInfo.age)}</p>` : ''}
+      ${stateInfo.advertising ? `<p><strong>Advertising Restrictions:</strong> ${sanitize(stateInfo.advertising)}</p>` : ''}
       <div class="divider"></div>
-      <p><span class="icon">ℹ️</span><strong>Details:</strong> ${stateInfo.description}</p>
-      <p><strong>Challenge to Current Legal Status:</strong> ${stateInfo.challenge}</p>
+      ${stateInfo.description ? `<p><span class="icon">ℹ️</span><strong>Details:</strong> ${sanitize(stateInfo.description)}</p>` : ''}
+      ${stateInfo.challenge ? `<p><strong>Marijuana's legal status:</strong> ${sanitize(stateInfo.challenge)}</p>` : ''}
     `;
   } else {
     infoBox.innerHTML = `<p>No information available for ${stateId}.</p>`;
   }
+}
+
+/**
+ * Sanitizes text to allow safe HTML rendering while preserving hyperlinks.
+ * @param {string} text - The text to sanitize.
+ * @returns {string} Sanitized HTML.
+ */
+function sanitize(text) {
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = text; // Interpret HTML, including links
+  const links = tempDiv.querySelectorAll('a');
+  links.forEach(link => {
+    // Ensure links open in a new tab and have a safe target
+    link.setAttribute('target', '_blank');
+    link.setAttribute('rel', 'noopener noreferrer');
+  });
+  return tempDiv.innerHTML;
 }
 
 // Function to reset info box when not hovering over any state and not pinned
