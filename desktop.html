@@ -1,0 +1,537 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive US Map with CSV Data</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    /* Main container holds both the map area and the right column */
+    #mainContainer {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: stretch;
+      box-sizing: border-box;
+    }
+
+    /* Map container will hold the SVG and the legend.
+       By using position: relative; and flex, elements inside will scale and position relatively */
+    #mapContainer {
+      position: relative;
+      flex: 1;
+      /* Take up remaining space except what's used by the right column */
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    /* SVG container now just flexes within #mapContainer */
+    #svg-container {
+      width: 100%;
+      height: 80%;
+      box-sizing: border-box;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 50px;
+      padding-bottom: 70px;
+    }
+
+    /* Legend is inside the #mapContainer and will be sized relative to it */
+    #legend {
+      font-size: 10px;
+      background-color: white;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      box-sizing: border-box;
+      position: absolute;
+      bottom: 10px;
+      margin-right: 10px;
+      margin-left: 10px;
+    }
+
+    #legend h3 {
+      font-size: 14px;
+      margin-top: 0;
+      width: 100%;
+    }
+
+    #legend div {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-right: 10px;
+    }
+
+    #legend span {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+    }
+
+    .green {
+      background-color: #006b57;
+    }
+
+    .light-green {
+      background-color: #009c80;
+    }
+
+    .yellow {
+      background-color: #e3c71f;
+    }
+
+    .dark-brown {
+      background-color: #6d3419;
+    }
+
+    .blue {
+      background-color: #007698;
+    }
+
+    .brown {
+      background-color: #b44b28;
+    }
+
+    .gray {
+      background-color: #808080;
+    }
+
+    .dark-green {
+      background-color: #005240;
+    }
+
+    .green2 {
+      background-color: #66b045;
+    }
+
+    /* Right column */
+    #right-column {
+      width: 250px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px;
+      box-sizing: border-box;
+      background-color: #fff;
+      overflow-y: auto;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Info box inside right column */
+    #info-box {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      overflow-wrap: break-word;
+      padding: 10px;
+      border-radius: 15px;
+      border: none;
+      background: linear-gradient(135deg, #004d40, #00796b);
+      color: white;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      max-height: calc(100vh - 100px);
+      overflow-y: auto;
+      font-size: 16px;
+    }
+
+    #info-box h2 {
+      font-size: 16px;
+      color: #ffffff;
+      margin-bottom: 5px;
+    }
+
+    #info-box p {
+      margin: 8px 0;
+      line-height: 1.5;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    #info-box p strong {
+      color: #ffd700;
+    }
+
+    #info-box .divider {
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+      margin: 5px 0;
+    }
+
+    .icon {
+      display: inline-block;
+      margin-right: 5px;
+      color: #ffd700;
+    }
+
+    #info-box a {
+      color: #ffffff;
+      text-decoration: underline;
+      font-weight: bold;
+      font-size: 12px;
+    }
+
+    #info-box a:hover {
+      color: #007bff;
+      text-decoration: underline;
+      font-size: 12px;
+    }
+
+    /* Logos horizontally aligned at the bottom of right-column or after info box */
+    #logos {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      /* Center logos horizontally */
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: auto;
+      /* Push this and everything after it to the bottom */
+    }
+
+    #bottom-right-image,
+    #bottom-right-image2 {
+      width: auto;
+      height: 35px;
+    }
+
+    #designer-credit {
+      font-size: 12px;
+      font-style: italic;
+      color: #333;
+      text-align: center;
+      width: 100%;
+      position: absolute;
+      right: 15px;
+      top: 20px;
+      width: auto;
+    }
+
+    /* Popup (instructions) positioned absolutely inside #mainContainer */
+    #info-popup {
+    display: none;
+    position: absolute;
+    border: 1px solid #ccc;
+    width: 300px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    padding: 10px;
+    box-sizing: border-box;
+    font-size: 12px;
+    top: 25px;
+    left: 25px;
+    background: linear-gradient(135deg, #004d40, #00796b);
+    color: white;
+    border: 0px;
+    }
+
+    #info-popup p {
+      margin: 8px 0;
+      line-height: 1.4;
+    }
+
+    #info-popup button {
+      display: block;
+      margin: 10px auto 0;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    #info-icon {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      cursor: pointer;
+      font-size: 24px;
+      z-index: 4000;
+      color: white;
+      padding: 2px 13px 2px 13px;
+      border-radius: 5px;
+      background-color: #005e50;
+      font-weight: bold;
+      font-family: serif;
+    }
+
+    svg {
+      cursor: pointer;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    svg path {
+      stroke: #fff;
+      stroke-width: 1px;
+      transition: stroke 0.3s ease;
+    }
+
+    svg path:hover {
+      stroke: #00a6ed;
+      stroke-width: 3px;
+      filter: drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.7));
+    }
+
+    .pinned {
+      stroke: #00a6ed;
+      stroke-width: 3px;
+      filter: drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.7));
+    }
+  </style>
+</head>
+
+<body>
+  <div id="info-icon">i</div>
+  <div id="mainContainer">
+    <div id="mapContainer">
+      <div id="designer-credit">Designed by Uilvim E. G. Franco and Bruno Sousa</div>
+      <div id="svg-container" class="svg-container"></div>
+      <div id="legend">
+        <div><span class="dark-green"></span> Legal</div>
+        <div><span class="green2"></span> Legal, Some Restrictions</div>
+        <div><span class="yellow"></span> Mixed</div>
+        <div><span class="brown"></span> Illegal</div>
+        <div><span class="dark-brown"></span> Heavily Restricted</div>
+      </div>
+    </div>
+    <div id="right-column">
+      <div id="info-box"> Hover over a state to see the details.</div>
+      <div id="logos">
+        <img id="bottom-right-image" src="https://riceconnect.rice.edu/image/baker/Baker_Horizontal_With-Rice_RGB.png" alt="Bottom Right Image">
+        <img id="bottom-right-image2" src="https://assets-crc-ssl-projects.s3.us-east-1.amazonaws.com/images/OIT%20%26%20CRC%20logo%20color%20with%20words%20%281%29.jpg" alt="Bottom Right Image">
+      </div>
+    </div>
+  </div>
+  <div id="info-popup">
+    <p>
+      This interactive map allows you to explore detailed information about each state by simply hovering your mouse
+      over it. When you hover over a state, an info box will display key details, making it easy to quickly gather
+      insights.
+    </p>
+    <p>
+      If you'd like to keep the information visible as you explore, just click on the state. This "pins" the info box,
+      so the details remain even if you move your mouse away. While a state is pinned, the info box won’t update when
+      you hover over other states, allowing you to focus on a specific state's information without interruption. Click
+      the state again to "unpin" it and return to hover mode. This feature makes it convenient to compare information
+      or revisit details at your own pace.
+    </p>
+    <button id="close-info-popup">Close</button>
+  </div>
+  <script>
+    fetch('https://s3.us-east-1.amazonaws.com/aubintime.spatialstudieslab.org/assets/svgs/us_states.svg')
+      .then(response => response.text())
+      .then(svgContent => {
+        // Inject the SVG content
+        document.getElementById('svg-container').innerHTML = svgContent;
+        // Initialize hover and click event listeners
+        const paths = document.querySelectorAll('svg path');
+        paths.forEach(path => {
+          // Hover listeners
+          path.addEventListener('mouseenter', () => {
+            if (!isPinned) {
+              const stateId = path.id;
+              showStateInfo(stateId);
+            }
+          });
+          path.addEventListener('mouseleave', resetInfoBox);
+          // Click listeners for pinning
+          path.addEventListener('click', () => {
+            if (pinnedPath && pinnedPath !== path) {
+              pinnedPath.classList.remove('pinned');
+            }
+            isPinned = !isPinned;
+            if (isPinned) {
+              path.classList.add('pinned');
+              pinnedPath = path;
+            } else {
+              path.classList.remove('pinned');
+              pinnedPath = null;
+            }
+          });
+        });
+      })
+      .catch(error => console.error('Error loading SVG:', error));
+    // Function to map types to colors
+    function getColorFromType(type) {
+      switch (type) {
+        case "Legal (Can only be sold where marijuana is sold)":
+          return "#006B57"; // Green
+        case "Legal (Regulated like marijuana)":
+          return "#009C80"; // Light Green
+        case "Legal, Some Restrictions":
+          return "#66B045"; // Green2
+        case "Mixed":
+          return "#E3C71F"; // Yellow
+        case "Heavily Restricted":
+          return "#6D3419"; // Dark Brown 
+        case "Illegal":
+          return "#B44B28"; // Brown
+        case "Gray area":
+          return "#808080"; // Gray
+        case "Legal":
+          return "#005240"; // Dark Green
+        default:
+          return "#A7A9AC"; // Default dark gray for undefined types
+      }
+    }
+    // Parse TSV data into an array of objects
+    function parseTSV(tsvText) {
+      const lines = tsvText.split('\n');
+      const headers = lines[0].split('\t').map(header => header.trim());
+      const data = lines.slice(1).map(line => {
+        const values = line.split('\t');
+        const rowData = {};
+        headers.forEach((header, i) => {
+          rowData[header] = values[i] ? values[i].trim() : '';
+        });
+        return rowData;
+      });
+      return data;
+    }
+    // Load TSV data and update state colors
+    const tsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRSw8J1erY15jXjGpurdxPAc1LRLTe6fu1lbHkVFyMuiRYUsdF17LDIQQKXium6pK3uB4Io5RJDsjj7/pub?gid=586541007&single=true&output=tsv';
+    let stateData = {};
+    fetch(tsvUrl)
+      .then(response => response.text())
+      .then(tsvText => {
+        const data = parseTSV(tsvText);
+        const stateColors = {};
+        // Assign colors based on 'Legal Status' in TSV and store state details
+        data.forEach(row => {
+          const stateName = row['State'] ? row['State'].trim() : '';
+          const type = row['Legal Status'] ? row['Legal Status'].trim() : '';
+          if (stateName && type) {
+            stateColors[stateName] = getColorFromType(type);
+            stateData[stateName] = {
+              lastUpdated: row['Last Updated'] ? row['Last Updated'].trim() : '',
+              type: type,
+              passedLegislation: row['Relevant Laws'] ? row['Relevant Laws'].trim() : '',
+              restrictions: row['Potency Restrictions'] ? row['Potency Restrictions'].trim() : '',
+              description: row['Details'] ? row['Details'].trim() : '',
+              age: row['Age Restrictions'] ? row['Age Restrictions'].trim() : '',
+              advertising: row['Advertising Restrictions'] ? row['Advertising Restrictions'].trim() : '',
+              challenge: row['Marijuana Is:'] ? row['Marijuana Is:'].trim() : ''
+            };
+          }
+        });
+        // Update state colors on the map
+        const paths = document.querySelectorAll('svg path');
+        paths.forEach(path => {
+          const stateId = path.id;
+          if (stateColors[stateId]) {
+            path.setAttribute('fill', stateColors[stateId]);
+          } else {
+            path.setAttribute('fill', '#252d33'); // Default color if no data
+          }
+        });
+      });
+    let isPinned = false;
+    let pinnedPath = null; // Track the currently pinned path
+    // Function to show state information in the info box
+    function showStateInfo(stateId) {
+      const infoBox = document.getElementById('info-box');
+      const stateInfo = stateData[stateId];
+      if (stateInfo) {
+        infoBox.innerHTML = `
+          <h2>${stateId}</h2>
+          ${stateInfo.lastUpdated ? `<p><strong>Last Updated:</strong> ${sanitize(stateInfo.lastUpdated)}</p>` : ''}
+          <div class="divider"></div>
+          ${stateInfo.type ? `<p><strong>Legal Status:</strong> ${sanitize(stateInfo.type)}</p>` : ''}
+          ${stateInfo.passedLegislation ? `<p><strong>Relevant Laws:</strong> ${sanitize(stateInfo.passedLegislation)}</p>` : ''}
+          ${stateInfo.restrictions ? `<p><strong>Potency Restrictions:</strong> ${sanitize(stateInfo.restrictions)}</p>` : ''}
+          ${stateInfo.age ? `<p><strong>Age Restrictions:</strong> ${sanitize(stateInfo.age)}</p>` : ''}
+          ${stateInfo.advertising ? `<p><strong>Advertising Restrictions:</strong> ${sanitize(stateInfo.advertising)}</p>` : ''}
+          <div class="divider"></div>
+          ${stateInfo.description ? `<p><span class="icon">ℹ️</span><strong>Details:</strong> ${sanitize(stateInfo.description)}</p>` : ''}
+          ${stateInfo.challenge ? `<p><strong>Marijuana's legal status:</strong> ${sanitize(stateInfo.challenge)}</p>` : ''}
+        `;
+      } else {
+        infoBox.innerHTML = `<p>No information available for ${stateId}.</p>`;
+      }
+    }
+    /**
+     * Sanitizes text to allow safe HTML rendering while preserving hyperlinks.
+     * @param {string} text - The text to sanitize.
+     * @returns {string} Sanitized HTML.
+     */
+    function sanitize(text) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = text;
+      const links = tempDiv.querySelectorAll('a');
+      links.forEach(link => {
+        // Ensure links open in a new tab and have a safe target
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+      });
+      return tempDiv.innerHTML;
+    }
+    // Function to reset info box when not hovering over any state and not pinned
+    function resetInfoBox() {
+      if (!isPinned) {
+        const infoBox = document.getElementById('info-box');
+        infoBox.innerHTML = 'Hover over a state to see the details.';
+      }
+    }
+    const paths = document.querySelectorAll('svg path');
+    paths.forEach(path => {
+      path.addEventListener('mouseenter', (event) => {
+        if (!isPinned) {
+          const stateId = path.id;
+          showStateInfo(stateId);
+        }
+      });
+      path.addEventListener('mouseleave', resetInfoBox);
+      path.addEventListener('click', () => {
+        if (pinnedPath && pinnedPath !== path) {
+          pinnedPath.classList.remove('pinned');
+        }
+        isPinned = !isPinned;
+        if (isPinned) {
+          path.classList.add('pinned');
+          pinnedPath = path;
+        } else {
+          path.classList.remove('pinned');
+          pinnedPath = null;
+        }
+      });
+    });
+    document.getElementById('info-icon').addEventListener('click', () => {
+      const infoPopup = document.getElementById('info-popup');
+      infoPopup.style.display = infoPopup.style.display != 'block' ? 'block' : 'none';
+    });
+    // Close button to hide the info popup
+    document.getElementById('close-info-popup').addEventListener('click', () => {
+      document.getElementById('info-popup').style.display = 'none';
+    });
+  </script>
+
+</body>
+
+</html>
